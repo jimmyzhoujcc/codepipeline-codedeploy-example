@@ -164,17 +164,6 @@ Resources:
             Configuration:
               ApplicationName: !Ref Application
               DeploymentGroupName: !Ref DeploymentGroup
-        - Name: Test
-          Actions:
-          - Name: Test
-            ActionTypeId:
-              Category: Invoke 
-              Owner: AWS 
-              Version: 1 
-              Provider: Lambda
-            Configuration:
-              FunctionName: !Ref TestLambda
-              UserParameters: !Sub 'http://${EC2Instance.PublicDnsName}'
   CodeDeployIAMRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -207,8 +196,8 @@ Resources:
       GroupDescription: 'static website'
       VpcId: !Ref VPC
       SecurityGroupIngress:
-      - FromPort: 80
-        ToPort: 80
+      - FromPort: 22
+        ToPort: 22
         IpProtocol: tcp
         CidrIp: '0.0.0.0/0'
   EC2InstanceProfile:
@@ -280,18 +269,6 @@ Resources:
             - codepipeline:PutJobSuccessResult
             Resource: "*"
             Effect: Allow
-  TestLambda:
-    Type: "AWS::Lambda::Function"
-    Properties: 
-      Code:
-        S3Bucket: 'codepipeline-codedeploy-example-lambda00'
-        S3Key: 'v2.zip'
-      FunctionName: 'codepipeline_http_test'
-      Handler: 'index.handler'
-      MemorySize: 128
-      Role: !Sub '${LambdaIAMRole.Arn}'
-      Runtime: 'nodejs12.x'
-      Timeout: 30
 Outputs:
   URL:
     Description: 'The URL pointing to the static website.'
